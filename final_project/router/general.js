@@ -10,19 +10,11 @@ const usernameExists = (username) => {
   return users.some((user) => user.username === username)
 }
 
-/*
-router.post("/", (req, res) => {
-  users.push({ firstName: req.query.firstName, lastName: req.query.lastName, email: req.query.email, DOB: req.query.DOB })
-  res.send("The user" + " " + req.query.firstName + " Has been added!")
-})
-*/
-
 public_users.post("/register", async (req, res) => {
   //const { username, password } = req.body
   const username = req.body.username
   const password = req.body.password
 
-  /*
   // Check if username and password are provided
   if (!username || !password) {
     return res.status(400).json({ message: "Both username and password are fields required" })
@@ -32,7 +24,7 @@ public_users.post("/register", async (req, res) => {
   if (usernameExists(username)) {
     return res.status(409).json({ message: "Username already exists" })
   }
-*/
+
   users.push({ username: req.query.username, password: req.query.password })
   res.send("The user" + " " + req.query.username + " Has been added!")
   /*
@@ -128,6 +120,55 @@ public_users.get("/review/:isbn", function (req, res) {
   } else {
     res.status(404).json({ message: "No book reviews found with the given ISBN" })
   }
+})
+
+// Get the book list available in the shop
+public_users.get("/", function (req, res) {
+  new Promise((resolve, reject) => {
+    if (books) resolve(books)
+    else reject("No books found")
+  })
+    .then((data) => res.send(data))
+    .catch((err) => res.status(404).json({ message: err }))
+})
+
+// Get book details based on ISBN
+public_users.get("/isbn/:isbn", function (req, res) {
+  const isbn = req.params.isbn
+  new Promise((resolve, reject) => {
+    const booksArray = Object.values(booksObj)
+    const filtered_books = booksArray.filter((book) => book.isbn === isbn)
+    if (filtered_books.length > 0) resolve(filtered_books)
+    else reject("No books found by the given ISBN")
+  })
+    .then((data) => res.send(data))
+    .catch((err) => res.status(404).json({ message: err }))
+})
+
+// Get book details based on author
+public_users.get("/author/:author", function (req, res) {
+  const author = req.params.author
+  new Promise((resolve, reject) => {
+    const booksArray = Object.values(booksObj)
+    const filtered_books = booksArray.filter((book) => book.author === author)
+    if (filtered_books.length > 0) resolve(filtered_books)
+    else reject("No books found by the given author")
+  })
+    .then((data) => res.send(data))
+    .catch((err) => res.status(404).json({ message: err }))
+})
+
+// Get all books based on title
+public_users.get("/title/:title", function (req, res) {
+  const title = req.params.title
+  new Promise((resolve, reject) => {
+    const booksArray = Object.values(booksObj)
+    const filtered_books = booksArray.filter((book) => book.title === title)
+    if (filtered_books.length > 0) resolve(filtered_books)
+    else reject("No books found by the given title")
+  })
+    .then((data) => res.send(data))
+    .catch((err) => res.status(404).json({ message: err }))
 })
 
 module.exports.general = public_users
